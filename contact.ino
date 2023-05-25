@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 #define MAX_NAME_LENGTH 32
 #define MAX_PHONE_LENGTH 13
 
@@ -31,15 +32,15 @@ void printPrompt() {
 // Fungsi untuk membuat kontak baru
 void createContact() {
     Serial.println("Enter name (max 32 characters):");
-    while (Serial.available() == 0)
-        ;
+    while (Serial.available() > 0) Serial.read();
+    while (Serial.available() == 0);
     String name = Serial.readStringUntil('\n');
     name.trim();
     name.toCharArray(tempName, MAX_NAME_LENGTH);
 
     Serial.println("Enter phone number (max 13 characters):");
-    while (Serial.available() == 0)
-        ;
+    while (Serial.available() > 0) Serial.read();
+    while (Serial.available() == 0);
     String phone = Serial.readStringUntil('\n');
     phone.trim();
     phone.toCharArray(tempPhone, MAX_PHONE_LENGTH);
@@ -101,8 +102,8 @@ struct Contact* findContact(const char* name) {
 // Fungsi untuk mengupdate kontak
 void updateContact() {
     Serial.println("Enter the name of the contact to update:");
-    while (Serial.available() == 0)
-        ;
+    while (Serial.available() > 0) Serial.read();
+    while (Serial.available() == 0);
     String name = Serial.readStringUntil('\n');
     name.trim();
     struct Contact* contactToUpdate = findContact(name.c_str());
@@ -112,19 +113,21 @@ void updateContact() {
         return;
     }
 
-    Serial.println("Enter new name (max 32 characters):");
-    while (Serial.available() == 0)
-        ;
+    Serial.println("Enter new name (max 32 characters, leave blank and press enter to skip):");
+    while (Serial.available() > 0) Serial.read();
+    while (Serial.available() == 0);
     String newName = Serial.readStringUntil('\n');
     newName.trim();
-    newName.toCharArray(contactToUpdate->name, MAX_NAME_LENGTH);
+    if (strlen(newName.c_str())>0)
+      newName.toCharArray(contactToUpdate->name, MAX_NAME_LENGTH);
 
-    Serial.println("Enter new phone number (max 13 characters):");
-    while (Serial.available() == 0)
-        ;
+    Serial.println("Enter new phone number (max 13 characters, leave blank and press enter to skip):");
+    while (Serial.available() > 0) Serial.read();
+    while (Serial.available() == 0);
     String newPhone = Serial.readStringUntil('\n');
     newPhone.trim();
-    newPhone.toCharArray(contactToUpdate->phone, MAX_PHONE_LENGTH);
+    if (strlen(newPhone.c_str())>0)
+      newPhone.toCharArray(contactToUpdate->phone, MAX_PHONE_LENGTH);
 
     Serial.println("Contact updated successfully!");
 }
@@ -132,8 +135,8 @@ void updateContact() {
 // Fungsi untuk menghapus kontak
 void deleteContact() {
     Serial.println("Enter the name of the contact to delete:");
-    while (Serial.available() == 0)
-        ;
+    while (Serial.available() > 0) Serial.read();
+    while (Serial.available() == 0);
     String name = Serial.readStringUntil('\n');
     name.trim();
 
@@ -168,25 +171,26 @@ void setup() {
 }
 
 void loop() {
-    if (Serial.available() > 0) {
-        int choice = Serial.parseInt();
-        switch (choice) {
-            case 1:
-                createContact();
-                break;
-            case 2:
-                readContacts();
-                break;
-            case 3:
-                updateContact();
-                break;
-            case 4:
-                deleteContact();
-                break;
-            default:
-                Serial.println("Invalid choice!");
-                break;
-        }
-        printPrompt();
-    }
+      printPrompt();
+      while (Serial.available() > 0) Serial.read();
+      while (Serial.available() == 0);
+      int choice = Serial.parseInt();
+      while (Serial.available() > 0) Serial.read();
+      switch (choice) {
+          case 1:
+              createContact();
+              break;
+          case 2:
+              readContacts();
+              break;
+          case 3:
+              updateContact();
+              break;
+          case 4:
+              deleteContact();
+              break;
+          default:
+              Serial.println("Invalid choice!");
+              break;
+      }
 }
